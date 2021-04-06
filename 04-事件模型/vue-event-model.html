@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        //全局event对象，提供on、off、emit方法
+        var event = (function () {
+            eventObjs = {};
+
+            return {
+                //注册事件，可以连续注册，可以注册多个事件
+                on: function (type, handler) { // type: 事件类型， handler：方法
+                    (eventObjs[type] || (eventObjs[type] = [])).push(handler);
+                },
+                /** 移除事件, 
+                 * - 如果没有参数, 移除所有事件, 
+                 * - 如果只带有 事件名 参数, 就移除这个事件名下的所有事件,
+                 * - 如果带有 两个 参数, 那么就是表示移除某一个事件的具体处理函数
+                 * */
+                off: function (type, handler) {
+                    if (arguments.lenth === 0) {
+                        eventObjs = {};
+                    } else if (arguments.length === 1) {
+                        eventObjs[type] = [];
+                    } else if (arguments.length === 2) {
+                        //遍历移除所有该函数对应的type
+                        let _events = eventObjs[type];
+                        if (!_events) return;
+
+                        for (let i = _events.length; i >= 0; i--) {
+                            if (_events[i] === handler) {
+                                _events.splice(i, 1);
+                            }
+                        }
+                    }
+                },
+                //触发事件，包装参数传递给事件处理函数
+                emit: function (type) {
+                    //arguments从1开始后的所有参数，返回的是数组
+                    let args = Array.prototype.slice.call(arguments, 1);
+
+                    let _events = eventObjs[type];
+                    if (!_events) return;
+
+                    for (let i = 0; i < _events.length; i++) {
+                        _events[i].apply(null, args)
+                    }
+                }
+            }
+        }());
+    </script>
+    <script>
+        //注册事件
+        event.on('click', () => {
+            console.log('注册第一个事件');
+        })
+
+        //移除事件
+        //event.off('click')
+
+        //触发事件
+        function f() {
+            event.emit('click');
+        }
+
+        f();
+    </script>
+</body>
+
+</html>
