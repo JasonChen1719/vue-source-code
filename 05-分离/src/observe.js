@@ -20,7 +20,7 @@ ARRAY_METHOD.forEach(method => {
 
     //将数据响应化
     for (let i = 0; i < arguments.length; i++) {
-      reactify(arguments[i]);
+      observe(arguments[i]);
     }
 
     let res = Array.prototype[method].apply(this, arguments);
